@@ -8,17 +8,19 @@ The generated prompt is deliberately strict about honesty: it instructs the mode
 
 Fill in three fields:
 
-| Field | Purpose |
-| --- | --- |
-| **Target Location** | Injected into the resume header line |
-| **Base Resume** | The source of truth — nothing outside this may be claimed |
-| **Job Description** | What the resume gets tailored toward |
+| Field | Purpose | Persisted |
+| --- | --- | --- |
+| **Target Location** | Injected into the resume header line | Yes |
+| **Base Resume** | The source of truth — nothing outside this may be claimed | Yes |
+| **Job Description** | What the resume gets tailored toward | No |
 
 The prompt updates live as you type. **Copy Tailoring Prompt** puts it on your clipboard; **Clear** resets every field.
 
+Your base resume and target location are saved to the browser's `localStorage`, so they are still there after a reload — paste the resume once and reuse it across applications. They persist until you edit them or press **Clear**. The job description is deliberately not saved, since it changes for every role.
+
 The prompt asks the model to return six sections: match score, strong matches, gaps, the tailored resume, keywords surfaced, and a "do not claim" list.
 
-Everything runs in the browser. No resume or job description data leaves your machine — there is no backend and no API call.
+Everything runs in the browser. No resume or job description data leaves your machine — there is no backend and no API call. The saved resume stays in that browser's local storage on that device, so avoid using the app on a shared machine, or press **Clear** when you are done.
 
 ## Getting started
 

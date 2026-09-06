@@ -1,11 +1,38 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 
+const STORAGE_KEY = "ats-prompt-builder.v1";
+
+// The base resume and target location rarely change, so they persist across
+// reloads. The job description is per-application and is intentionally not saved.
+const loadSaved = () => {
+  try {
+    const parsed = JSON.parse(localStorage.getItem(STORAGE_KEY));
+    return parsed && typeof parsed === "object" ? parsed : {};
+  } catch {
+    // Storage can be unavailable (private mode, blocked cookies) or hold stale JSON.
+    return {};
+  }
+};
+
 export default function ResumeTailoringPromptBuilder() {
-  const [location, setLocation] = useState("");
-  const [resume, setResume] = useState("");
+  const [saved] = useState(loadSaved);
+  const [location, setLocation] = useState(saved.location ?? "");
+  const [resume, setResume] = useState(saved.resume ?? "");
   const [jobDescription, setJobDescription] = useState("");
   const [copyState, setCopyState] = useState("idle");
   const copyTimer = useRef(null);
+
+  useEffect(() => {
+    try {
+      if (!location && !resume) {
+        localStorage.removeItem(STORAGE_KEY);
+      } else {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify({ location, resume }));
+      }
+    } catch {
+      // Persistence is best effort; the app stays usable without it.
+    }
+  }, [location, resume]);
 
   const tailoringPrompt = useMemo(() => {
     return `
@@ -317,6 +344,11 @@ ${jobDescription || "[PASTE JOB DESCRIPTION HERE]"}
             fontFamily: "monospace",
           }}
         />
+
+        <small style={{ color: "#666" }}>
+          Saved in this browser, along with the target location, until you edit
+          it or press Clear.
+        </small>
       </div>
 
       <div style={{ marginBottom: "18px" }}>
